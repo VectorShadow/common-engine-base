@@ -3,7 +3,7 @@ package org.vsdl.common.engine.dev;
 import org.vsdl.common.engine.event.Event;
 import org.vsdl.common.engine.event.EventHandler;
 
-public class TestHandler implements EventHandler {
+public class TestHandler extends EventHandler {
 
     private long eventCount = 0;
     @Override

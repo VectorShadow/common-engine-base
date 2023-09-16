@@ -22,6 +22,13 @@ public abstract class EventScheduler extends EventThread {
     }
 
     protected void scheduleEvent(Event event, int schedulingPassThisTurn) {
+        scheduleEvent(event, schedulingPassThisTurn, false);
+    }
+
+    protected void scheduleEvent(Event event, int schedulingPassThisTurn, boolean unlockEngineDueToUserInput) {
+        if (unlockEngineDueToUserInput) {
+            eventEngine.setUserInputLock(false);
+        }
         event.setScheduledBy(this);
         eventEngine.scheduleEvent(new ScheduledEvent(event, eventEngine.getCurrentFrame() + schedulingPassThisTurn + 1));
     }

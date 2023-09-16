@@ -12,6 +12,7 @@ public class EventEngine extends EventThread {
 
     private boolean executionLock;
     private boolean scheduleLock;
+    private boolean userInputLock;
 
     private final Queue<ScheduledEvent> scheduledEvents = new PriorityQueue<>();
 
@@ -30,14 +31,23 @@ public class EventEngine extends EventThread {
             throw new IllegalStateException("Event Handlers may not be attached while Engine is running!");
         }
         handlers.add(eventHandler);
+        eventHandler.linkToEngine(this);
     }
 
     public void run() {
         startRunning();
         currentFrame = 0L;
         executionLock = false;
+        userInputLock = false;
         do {
             scheduleLock = true;
+            while (userInputLock) {
+                try {
+                    Thread.sleep(framerate / 4);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             while (executionLock) {
                 try {
                     Thread.sleep(framerate / 4);
@@ -51,11 +61,10 @@ public class EventEngine extends EventThread {
                     handler.handleEvent(scheduledEvent.getEvent());
                 }
             }
-            long now = System.currentTimeMillis();
             ++currentFrame;
+            scheduleLock = false;
             try {
-                scheduleLock = false;
-                Thread.sleep(now % framerate);
+                Thread.sleep(System.currentTimeMillis() % framerate);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -91,5 +100,14 @@ public class EventEngine extends EventThread {
 
     long getCurrentFrame() {
         return currentFrame;
+    }
+
+    /**
+     * For a turn based engine. Allow execution to be paused indefinitely while waiting for the user's next command.
+     * Handler is responsible for locking, Scheduler for unlocking.
+     * @param isLockedForUserInput true on user input handled, false on user input scheduled
+     */
+    void setUserInputLock(boolean isLockedForUserInput) {
+        userInputLock = isLockedForUserInput;
     }
 }
