@@ -10,15 +10,25 @@ public class TestScheduler extends EventScheduler implements EventSource {
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    private final int minimumEventsPerTurn;
+    private final int maximumEventsPerTurn;
+
+
     public TestScheduler(EventEngine eventEngine, int turnLengthInEngineFrames) {
+        this(eventEngine, turnLengthInEngineFrames, 0, 99);
+    }
+
+    public TestScheduler(EventEngine eventEngine, int turnLengthInEngineFrames, int minimumEventsPerTurn, int maximumEventsPerTurn) {
         super(eventEngine, turnLengthInEngineFrames);
+        this.minimumEventsPerTurn = minimumEventsPerTurn;
+        this.maximumEventsPerTurn = maximumEventsPerTurn;
     }
 
     @Override
     public void run() {
         startRunning();
         do {
-            int numberOfEventsThisTurn = secureRandom.nextInt(99);
+            int numberOfEventsThisTurn = minimumEventsPerTurn + secureRandom.nextInt(maximumEventsPerTurn);
             System.out.println("Scheduling " + numberOfEventsThisTurn + " events this turn.");
             for (int i = 0; i < numberOfEventsThisTurn; ++i) {
                 scheduleEvent(new TestEvent(this), i / getTurnLengthInEngineFrames());

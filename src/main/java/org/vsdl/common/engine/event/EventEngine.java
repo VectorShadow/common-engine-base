@@ -98,7 +98,7 @@ public class EventEngine extends EventThread {
         this.framerate = framerate;
     }
 
-    long getCurrentFrame() {
+    public long getCurrentFrame() {
         return currentFrame;
     }
 
