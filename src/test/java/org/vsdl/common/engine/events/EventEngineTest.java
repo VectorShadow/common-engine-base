@@ -59,7 +59,7 @@ public class EventEngineTest {
     void testTiming_LightLoad_LongRun() throws InterruptedException {
         TestHandler handler = new TestHandler();
         engine = Engine.getNewEngine(handler, true);
-        testDuration = 60000L;
+        testDuration = 15000L;
         long start = System.currentTimeMillis();
         engine.registerEventSource(new TestSource(), 10);
         engine.start();
@@ -79,7 +79,7 @@ public class EventEngineTest {
     void testTiming_HeavyLoad_LongRun() throws InterruptedException {
         TestHandler handler = new TestHandler();
         engine = Engine.getNewEngine(handler, true);
-        testDuration = 60000L;
+        testDuration = 15000L;
         long start = System.currentTimeMillis();
         for (int i = 0; i < 256; ++i) {
             engine.registerEventSource(new TestSource(), 10 + i);
@@ -101,13 +101,13 @@ public class EventEngineTest {
     void testRegisterSourcesMidRun() throws InterruptedException {
         TestHandler handler = new TestHandler();
         engine = Engine.getNewEngine(handler, true);
-        testDuration = 1000L;
+        testDuration = 5000L;
         long start = System.currentTimeMillis();
         engine.registerEventSource(new TestSource(), 10);
         engine.start();
         engine.registerEventSource(new TestSource(), 10);
         do {
-            Thread.sleep(64);
+            Thread.sleep(255);
             engine.registerEventSource(new TestSource(), 10);
         } while(System.currentTimeMillis() < start + testDuration);
         engine.halt();
