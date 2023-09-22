@@ -59,8 +59,13 @@ public class Engine extends Thread {
         do {
             while ((!isRealtime && isRunning()) || eventQueue.peek().getExecuteAtTime() < System.currentTimeMillis()) {
                 now = System.currentTimeMillis();
-                eventQueue.alter(eventHandler.handle(eventQueue.alter(null), isRealtime() ? now : internalTime));
-                internalTime = eventQueue.peek().getExecuteAtTime();
+                EngineEvent nextEvent = eventQueue.alter(null);
+                if (nextEvent.getSource().isRegistered()) {
+                    eventQueue.alter(eventHandler.handle(nextEvent, isRealtime() ? now : internalTime));
+                }
+                if (!isRealtime) {
+                    internalTime = eventQueue.peek().getExecuteAtTime();
+                }
             }
             if (isRealtime) {
                 now = System.currentTimeMillis();
