@@ -1,40 +1,36 @@
 package org.vsdl.common.engine.events;
 
+import org.vsdl.common.engine.utils.ManagedThread;
 import org.vsdl.common.engine.utils.ProtectedPriorityQueue;
 
-public class Engine extends Thread {
+public class Engine extends ManagedThread {
     private static final long DEFAULT_PEEK_INTERVAL = 10L;
-    private static long peekInterval = DEFAULT_PEEK_INTERVAL;
-
     private final EventHandler eventHandler;
     private final ProtectedPriorityQueue<EngineEvent> eventQueue = new ProtectedPriorityQueue<>();
     private long internalTime;
     private final boolean isRealtime;
-    private boolean isRunning = false;
+    private final long peekInterval;
 
-    private Engine(final EventHandler eventHandler, final boolean isRealtime) {
+    private Engine(final EventHandler eventHandler, final boolean isRealtime, final long peekInterval) {
         this.eventHandler = eventHandler;
         this.isRealtime = isRealtime;
+        this.peekInterval = peekInterval;
+    }
+
+    public static Engine getNewEngine(final EventHandler eventHandler, final boolean isRealtime, final long peekInterval) {
+        return new Engine(eventHandler, isRealtime, peekInterval);
     }
 
     public static Engine getNewEngine(final EventHandler eventHandler, final boolean isRealtime) {
-        return new Engine(eventHandler, isRealtime);
+        return getNewEngine(eventHandler, isRealtime, DEFAULT_PEEK_INTERVAL);
     }
 
     public long getInternalTime() {
         return internalTime;
     }
 
-    public void halt() {
-        isRunning = false;
-    }
-
     public boolean isRealtime() {
         return isRealtime;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
     }
 
     public synchronized void registerEventSource(EventSource eventSource, int millisBeforeFirstEvent) {
@@ -51,7 +47,7 @@ public class Engine extends Thread {
 
     @Override
     public void run() {
-        isRunning = true;
+        doStart();
         if (isRealtime) {
             internalTime = 0L;
         }
