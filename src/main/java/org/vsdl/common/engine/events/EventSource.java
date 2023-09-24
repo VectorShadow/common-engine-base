@@ -1,9 +1,6 @@
 package org.vsdl.common.engine.events;
 
-public interface EventSource {
+import org.vsdl.common.engine.utils.Registrable;
 
-    boolean isRegistered();
-
-    void setRegistered(boolean registered);
-
+public interface EventSource extends Registrable {
 }
