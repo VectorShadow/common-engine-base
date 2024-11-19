@@ -15,7 +15,7 @@ public class TestHandler implements EventHandler {
     public EngineEvent handle(EngineEvent event, long engineTime) {
         EventSource source = event.getSource();
         ++eventCount;
-        return new EngineEvent(engineTime + 5 + random.nextLong(25), source);
+        return new EngineEvent(engineTime + 5 + random.nextInt(25), source);
     }
 
     public int getEventCount() {
