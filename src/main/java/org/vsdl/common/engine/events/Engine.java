@@ -33,6 +33,10 @@ public class Engine extends ManagedThread {
         return isRealtime;
     }
 
+    public boolean hasEventSourcesQueued() {
+        return eventQueue.peek() != null;
+    }
+
     public synchronized void registerEventSource(EventSource eventSource, int millisBeforeFirstEvent) {
         eventQueue.alter(
                 new EngineEvent(
